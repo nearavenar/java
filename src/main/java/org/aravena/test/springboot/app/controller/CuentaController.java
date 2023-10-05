@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -24,6 +25,18 @@ public class CuentaController {
     @ResponseStatus(HttpStatus.OK)
     public Cuenta detalleCuenta(@PathVariable(name = "id") Long id){
         return cuentaService.findById(id);
+    }
+
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public List<Cuenta> getAll(){
+        return cuentaService.findAll();
+    }
+
+    @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
+    public Cuenta save(@RequestBody Cuenta cuenta){
+        return cuentaService.save(cuenta);
     }
 
     @PostMapping("/transferir")

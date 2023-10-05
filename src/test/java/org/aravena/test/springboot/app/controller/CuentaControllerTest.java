@@ -3,11 +3,13 @@ package org.aravena.test.springboot.app.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.aravena.test.springboot.app.dto.TransaccionDto;
+import org.aravena.test.springboot.app.model.Cuenta;
 import org.aravena.test.springboot.app.service.CuentaService;
 import org.aravena.test.springboot.app.utils.Datos;
+import static org.hamcrest.Matchers.hasSize;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,6 +22,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -110,5 +113,45 @@ class CuentaControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.transaccion.monto").value(100))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.mensaje").value("Transferencia realizada con éxito"))
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(response)));
+    }
+
+    @Test
+    void findAllTest() throws Exception {
+        //Given
+        when(cuentaService.findAll()).thenReturn(Datos.listaCuentas());
+
+        //When
+        mockMvc.perform(get("/api/cuentas").contentType(MediaType.APPLICATION_JSON))
+        //Then
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].persona").value("Nicolás"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].saldo").value("1000"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].persona").value("Denisse"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[1].saldo").value("2000"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[2].persona").value("José"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(5)))
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(Datos.listaCuentas())));
+    }
+
+    @Test
+    void saveTest() throws Exception {
+        Cuenta cuenta = new Cuenta(null, "Eugenio", new BigDecimal("3000"));
+        when(cuentaService.save(any())).then(invocation -> {
+            Cuenta c = invocation.getArgument(0);
+            c.setId(3L);
+            return c;
+        });
+
+        mockMvc.perform(post("/api/cuentas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(cuenta)))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id", is(3)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.persona", is("Eugenio")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.saldo", is(3000)));
+
+        verify(cuentaService).save(any());
     }
 }

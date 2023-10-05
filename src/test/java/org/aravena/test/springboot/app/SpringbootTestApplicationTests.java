@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @SpringBootTest
 class SpringbootTestApplicationTests {
@@ -124,5 +125,38 @@ class SpringbootTestApplicationTests {
 		assertEquals("Nicolás", cuentaDos.getPersona());
 
 		verify(cuentaRepository, times(2)).findById(anyLong());
+	}
+
+	@Test
+	void findAllTest() {
+		//Given
+		when(cuentaRepository.findAll()).thenReturn(Datos.listaCuentas());
+
+		//When
+		List<Cuenta> cuentas = cuentaService.findAll();
+
+		//Then
+		assertFalse(cuentas.isEmpty());
+		assertEquals(5, cuentas.size());
+
+		verify(cuentaRepository).findAll();
+	}
+
+	@Test
+	void saveTest() {
+		Cuenta nueva = new Cuenta(null, "Jorge", new BigDecimal("40000"));
+		when(cuentaRepository.save(any())).then(invocation -> {
+			Cuenta c = invocation.getArgument(0);
+			c.setId(6L);
+			return c;
+		});
+
+		Cuenta cuenta = cuentaService.save(nueva);
+
+		assertEquals(6L, cuenta.getId());
+		assertEquals("Jorge", cuenta.getPersona());
+		assertEquals("40000", cuenta.getSaldo().toPlainString());
+
+		verify(cuentaRepository).save(any());
 	}
 }
