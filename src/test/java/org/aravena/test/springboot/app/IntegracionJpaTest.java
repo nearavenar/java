@@ -3,6 +3,8 @@ package org.aravena.test.springboot.app;
 import org.aravena.test.springboot.app.model.Cuenta;
 import org.aravena.test.springboot.app.repository.CuentaRepository;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -13,6 +15,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 //Pruebas de integracion -> habilita todas las preexistencias y repositorios
+//@Tag("integracion_jpa")
 @DataJpaTest
 public class IntegracionJpaTest {
     

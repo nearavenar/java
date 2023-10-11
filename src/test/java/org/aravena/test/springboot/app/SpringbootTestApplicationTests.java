@@ -18,7 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.math.BigDecimal;
 import java.util.List;
 
-@SpringBootTest
+@SpringBootTest //Mock MVC
 class SpringbootTestApplicationTests {
 
 	CuentaRepository cuentaRepository;
